@@ -1,0 +1,45 @@
+1. I need some kind of metaphor, like collaborating on drawing a picture all at once. Start with one person drawing a sketch,
+and then we make copies of that sketch. Each person makes their own modifications. I can draw pictures to demonstrate merging and merging
+conflicts this way.
+
+2. The goal for the first chapter is that you should be able to show this to the most useless turkey in middle management and have them
+understand it, whether they can type on a keyboard or not.
+
+******************************
+
+INTRO TO GET COMMANDS ##just get a draft down for now##
+
+If you're under the age of 35, you likely were raised on GUIs. A GUI, or Graphical User Interface, is where you interact with the computer by manipulating pictures on the screen. When you click the little window icon on Windows to get the start menu, you're using a GUI. When you click the X to close a window, you're using a GUI. When you use the mouse at all, you're using a GUI.
+
+Before GUIs, work on computers was typically done through something called a terminal, where all of the work is done through text. If you have ever used Command Prompt on Windows, then you know what a terminal looks like. If you have ever used the command line interface for MS-DOS, the predecessor to Command
+Prompt, then you know what a terminal looks like.
+
+******************************
+
+You're an artist, and you're part of a team of artists who want to draw a picture together. How will this work out? How can you have dozens of artists working on just one picture?
+
+One of the artists, Alan, comes up with an idea. He will start off by drawing a picture of a hill:
+
+(a picture of a hill here)
+
+The other artists will all collaborate on drawing a landscape, beginning with this hill. When Alan creates the picture, he places it in a REPOSITORY, where the other artists can all see it. Along come Bob and Carrie, who each make a copy of the picture. Making a copy like this is called PULLING the picture. Bob and Carrie each make modifications to their picture; Bob paints a picture of a barn next to the hill, while Carrie draws some corn on the other side of the hill. Now Bob and Carrie have each made a picture of their own:
+
+(two pictures, one labeled "Bob" and one labeled "Carrie")
+
+Bob and Carrie each place their modified pictures onto a stage, where they take a snapshot of it to be placed into their LOCAL REPOSITORY. Then they each take their branch and PUSH it back to the REMOTE REPOSITORY, where Alan put his first picture. They each make a separate BRANCH of the project before they PUSH it back.  Alan decides that the barn and corn go well together, so he MERGES the two pictures. There are different ways that he can merge them. He can CHECK OUT Bob's picture and MERGE Carrie's picture into it, in which case Bob's picture would have both the barn and the corn, while Carrie's picture would have only the corn:
+
+(Two pictures, one labeled "Bob" and one labeled "Carrie," set up as described)
+
+Alternately, he can CHECK OUT Carrie's picture and MERGE Bob's picture into it, in which case Bob's picture would have only the barn, while Carrie's picture would have both the barn and the corn.
+
+(Two pictures, one labeled "Bob" and one labeled "Carrie," set up as described)
+
+However, Alan wants to combine both into the original picture. So he CHECKS OUT his original picture, the MASTER branch of the project, and MERGES Bob's picture into it, and then MERGES Carrie's picture.
+
+(a picture of the hill including Bob's barn and Carrie's corn, labeled Alan)
+
+Now, along comes another artist, Dallas, who decides to add a picture of dog, and Eevie, who wants to add a picture of an eagle. Dallas PULLS the project, and adds a picture of a dog sitting on top of the barn. Eevie also PULLS the project and adds an eagle sitting on top of the barn. Both of them place their projects on the STAGE and PUSH their own BRANCHES to the REPOSITORY.
+
+Uh-oh! Now there's a conflict. We can't have both an eagle and a dog sitting in the same place on top of the barn. There's only room for one animal up there. So, what will they do? They will have to get together and talk it over to make a decision. Let's say that Dallas agrees that perhaps the dog should be on the ground, rather than on top of the barn. In that case, Dallas will make the modification in his own LOCAL REPOSITORY, and then PUSH that new COMMIT back to the REMOTE REPOSITORY to be MERGED with the other picture. now, the whole history of commits looks like this:
+
+(show tree diagram of commits with branch names and who made the commits, with accompanying pictures)
