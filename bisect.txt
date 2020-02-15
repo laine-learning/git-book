@@ -1,0 +1,106 @@
+Let's say you have a long, long, long git branch. Hundreds, maybe even thousands of commits all on one long branch. Now let's say that you have a bug. You're not sure how long the software has had the bug, but you know it wasn't always there. Somewhere along the line, in one of those many many commits, somebody done goofed, and now it's up to you to sort through the haystack to find the needle. Lucky for you, git bisect exists!
+
+Git bisect uses something called a binary search algorithm. The idea behind a binary search algorithm is to reduce the time it takes to find things by searching in a specialized manner. To understand the binary search algorithm, imagine a long line of crates, say, twenty-one crates long. Each crate is supposed to contain exactly one sea turtle. However, the person whose job it was to place sea turtles into the crates only placed a few, and then stopped. You know that the first crate has a sea turtle (denoted T) and the last one is empty (denoted E). Moreover, you know that whoever placed the sea turtles into the crates was competent enough not to skip crates; the first n crates (where n is an unknown number) contain sea turtles, and the rest are empty. So we have this situation:
+
+[T][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][E]
+
+The question now arises, what is the fastest way to find the first empty crate? Instead of simply starting at one end and opening crates until we find the first empty one -- an extremely inefficient algorithm -- we ought to instead use binary search. We begin by opening the crate nearest to the middle. We will denote that we have opened the crate by putting an O over it:
+                               
+                               O
+[T][?][?][?][?][?][?][?][?][?][E][?][?][?][?][?][?][?][?][?][E]
+
+which turns out to be empty. Remember that there are no gaps; the first few crates contain sea turtles but the rest are empty. So all crates to the right of this one must be empty.  So we know that the arrangement looks like this:
+  
+                               O
+[T][?][?][?][?][?][?][?][?][?][E][E][E][E][E][E][E][E][E][E][E]
+
+The nine crates on the left are still mysteries. We will apply our little technique again, opening the crate in the middle:
+
+                O              O
+[T][?][?][?][?][T][?][?][?][?][E][E][E][E][E][E][E][E][E][E][E]
+
+That crate contains a turtle. Huzzah! Again recalling that there are no gaps, we know that the turtle-placer has placed a turtle in all crates prior to this one, so we now know that the crates are arranged thus:
+
+                O              O
+[T][T][T][T][T][T][?][?][?][?][E][E][E][E][E][E][E][E][E][E][E]
+
+Now, we know that crates 8 and 9 could both be considered the "center" of the line of unknown crates, so let's arbitrarily pick 8:
+
+                O     O        O
+[T][T][T][T][T][T][?][E][?][?][E][E][E][E][E][E][E][E][E][E][E]
+
+Empty. That means that crates 9 and 10 must also be empty:
+
+                O     O        O
+[T][T][T][T][T][T][?][E][E][E][E][E][E][E][E][E][E][E][E][E][E]
+
+And opening the last crate, we find:
+
+                O  O  O        O
+[T][T][T][T][T][T][T][E][E][E][E][E][E][E][E][E][E][E][E][E][E]
+
+So we've managed to sort out 21 crates while only opening four of them. If you're wondering why we used such a complicated process, just ask yourself how difficult it would have been to open the crates from the beginning or end and simply brute-force search. If we had started from the beginning and done that, we would have had to open eight crates before we found the first empty one. If we had started from the end, we would have had to open 15 crates before finding the first turtle! Binary search is much more efficient.
+
+What is even more striking about binary search is its scalability. Even with huge numbers of objects, it still doesn't take long to use binary search. What if we have 51 crates, with the first 17 filled with sea turtles? Assume we don't know that the sea turtles go out to 17.
+
+[T][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][E]
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+
+To figure out that 17 is the final turtle box and 18 is the first empty box, we can use binary search. It's a cinch. First, open box 26, which is the middle box:
+
+                                                                            O
+[T][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][E][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][E]
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+
+Empty! So we know that:
+
+                                                                            O
+[T][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][?][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E]
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+
+The middlemost of the unknown boxes is 12 or 13, so let's pick 12:
+
+                                  O                                         O
+[T][?][?][?][?][?][?][?][?][?][?][T][?][?][?][?][?][?][?][?][?][?][?][?][?][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E]
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+
+It has a turtle, of course, so we know that:
+
+                                  O                                         O
+[T][T][T][T][T][T][T][T][T][T][T][T][?][?][?][?][?][?][?][?][?][?][?][?][?][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E]
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+
+s`sThe string of unknown boxes goes from 13 to 25, so there are thirteen unknown boxes. The middle one is 19, so let's open it. It's empty, which means all the ones to the right of it are, too. We open a few more in the following steps:
+
+
+                                  O                    O                    O
+[T][T][T][T][T][T][T][T][T][T][T][T][?][?][?][?][?][?][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E]
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+
+
+
+                                  O                    O                    O
+[T][T][T][T][T][T][T][T][T][T][T][T][?][?][?][?][?][?][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E]
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+
+                                  O        O           O                    O
+[T][T][T][T][T][T][T][T][T][T][T][T][T][T][T][?][?][?][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E]
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+
+                                  O        O     O     O                    O
+[T][T][T][T][T][T][T][T][T][T][T][T][T][T][T][T][T][?][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E]
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+
+                                  O        O     O  O  O                    O
+[T][T][T][T][T][T][T][T][T][T][T][T][T][T][T][T][T][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E][E]
+1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51
+
+Notice that, with ten boxes, we had to  open four in order to solve. But with fifty boxes, we only had to open six. So multiplying the number of boxes by five only raised the number of steps by two! It does not take much longer to searh through fifty boxes than it does through ten. Binary search is an extremely efficient algorithm!
+
+The idea behind git bisect is that you take a commit - which presumably has some sort of bug - and the most recent commit known not to have that bug, and those form the two endpoints in the line of boxes:
+
+$ git bisect start
+$ git bisect nameOfBadCommit          
+$ git bisect nameOfGoodCommit
+
+Git will then select the commit that is dead center between those two.
